@@ -1,0 +1,111 @@
+http://127.0.0.1:5500/index.html
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#4F81BD">
+  <link rel="manifest" href="manifest.json">
+  <title>Suivi Forme & Nutrition</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      background-color: #f4f7fa;
+      margin: 0;
+    }
+    h1, h2 {
+      color: #2c3e50;
+      text-align: center;
+    }
+    .header-image {
+      display: block;
+      margin: 0 auto 20px auto;
+      max-width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    form {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      color: #34495e;
+      font-size: 1rem;
+    }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px;
+      background-color: #4F81BD;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #3b6a9b;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 6px;
+      text-align: center;
+    }
+    th {
+      background-color: #4F81BD;
+      color: white;
+    }
+    canvas {
+      margin-top: 20px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      width: 100% !important;
+      height: auto !important;
+    }
+    @media (max-width: 600px) {
+      body { padding: 5px; }
+      label, input, select, textarea, button { font-size: 1rem; }
+      table, th, td { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Suivi Santé et Forme</h1>
+  <img class="header-image" src="A_symbolic_and_artistic_representation_of_holistic.png" alt="Santé et bien-être holistique">
+
+  <!-- Formulaire et contenus précédents ici -->
+
+  <!-- Scripts JS existants ici -->
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log("Service Worker enregistré", reg))
+          .catch(err => console.error("Erreur Service Worker", err));
+      });
+    }
+  </script>
+</body>
+</html>

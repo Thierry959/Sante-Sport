@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suivi Forme & Nutrition</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      background-color: #f4f7fa;
+      margin: 0;
+    }
+    h1, h2 {
+      color: #2c3e50;
+      text-align: center;
+    }
+    form {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      color: #34495e;
+      font-size: 1rem;
+    }
+    input, textarea, select, button {
+      width: 100%;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px;
+      background-color: #4F81BD;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #3b6a9b;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: white;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 6px;
+      text-align: center;
+    }
+    th {
+      background-color: #4F81BD;
+      color: white;
+    }
+    canvas {
+      margin-top: 20px;
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      width: 100% !important;
+      height: auto !important;
+    }
+    @media (max-width: 600px) {
+      body { padding: 5px; }
+      label, input, select, textarea, button { font-size: 1rem; }
+      table, th, td { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Suivi Santé et Forme</h1>
+  <form id="formulaire" onsubmit="event.preventDefault(); enregistrerDonnees();">
+    <label for="nom">Nom :</label>
+    <input type="text" id="nom" required>
+
+    <label for="date">Date :</label>
+    <input type="date" id="date" required>
+
+    <label for="poids">Poids (kg) :</label>
+    <input type="number" step="0.1" id="poids" required>
+
+    <label for="taille">Tour de taille (cm) :</label>
+    <input type="number" step="0.1" id="taille">
+
+    <label for="hanches">Tour de hanches (cm) :</label>
+    <input type="number" step="0.1" id="hanches">
+
+    <label for="cuisse">Tour de cuisse (cm) :</label>
+    <input type="number" step="0.1" id="cuisse">
+
+    <label for="tension">Tension artérielle (mmHg) :</label>
+    <input type="text" id="tension" placeholder="ex: 125/80" required>
+
+    <label for="glycemie">Glycémie à jeun :</label>
+    <input type="text" id="glycemie" required>
+
+    <label for="sommeil">Qualité du sommeil (1-5) :</label>
+    <input type="number" id="sommeil" min="1" max="5" required>
+
+    <label for="energie">Énergie ressentie (1-5) :</label>
+    <input type="number" id="energie" min="1" max="5" required>
+
+    <label for="nutrition">Bilan nutritionnel :</label>
+    <select id="nutrition" required>
+      <option value="Équilibré">Équilibré</option>
+      <option value="Trop riche">Trop riche</option>
+      <option value="Pas assez">Pas assez</option>
+      <option value="Repas sauté">Repas sauté</option>
+    </select>
+
+    <label for="commentaire">Commentaire :</label>
+    <textarea id="commentaire"></textarea>
+
+    <button type="submit">Ajouter</button>
+    <button type="button" onclick="exporterExcel()">Exporter vers Excel</button>
+  </form>
+
+  <h2>Tableau de suivi</h2>
+  <table id="tableauSuivi">
+    <tr>
+      <th>Date</th>
+      <th>Poids (kg)</th>
+      <th>Taille</th>
+      <th>Hanches</th>
+      <th>Cuisse</th>
+      <th>Tension</th>
+      <th>IMC</th>
+      <th>Glycémie</th>
+      <th>Sommeil</th>
+      <th>Énergie</th>
+      <th>Nutrition</th>
+      <th>Commentaire</th>
+    </tr>
+  </table>
+
+  <h2>Graphique Poids</h2>
+  <canvas id="graphPoids"></canvas>
+  <h2>Graphique Sommeil</h2>
+  <canvas id="graphSommeil"></canvas>
+
+  <script>
+    const historiquePoids = [], historiqueDates = [], historiqueSommeil = [];
+
+    function enregistrerDonnees() {
+      const date = document.getElementById('date').value;
+      const poids = parseFloat(document.getElementById('poids').value);
+      const taille = document.getElementById('taille').value;
+      const hanches = document.getElementById('hanches').value;
+      const cuisse = document.getElementById('cuisse').value;
+      const tension = document.getElementById('tension').value;
+      const glycemie = document.getElementById('glycemie').value;
+      const sommeil = document.getElementById('sommeil').value;
+      const energie = document.getElementById('energie').value;
+      const nutrition = document.getElementById('nutrition').value;
+      const commentaire = document.getElementById('commentaire').value;
+      let imc = "";
+      if (poids && taille) imc = (poids / ((taille / 100) ** 2)).toFixed(1);
+
+      const ligne = document.getElementById('tableauSuivi').insertRow(-1);
+      [date, poids, taille, hanches, cuisse, tension, imc, glycemie, sommeil, energie, nutrition, commentaire].forEach(val => {
+        const cell = ligne.insertCell();
+        cell.textContent = val;
+      });
+
+      historiqueDates.push(date);
+      historiquePoids.push(poids);
+      historiqueSommeil.push(sommeil);
+      majGraphiques();
+      document.getElementById('formulaire').reset();
+    }
+
+    function exporterExcel() {
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.table_to_sheet(document.getElementById('tableauSuivi'));
+      XLSX.utils.book_append_sheet(wb, ws, "Suivi Forme");
+      XLSX.writeFile(wb, "Suivi_Forme.xlsx");
+    }
+
+    function majGraphiques() {
+      const poidsCtx = document.getElementById('graphPoids').getContext('2d');
+      const sommeilCtx = document.getElementById('graphSommeil').getContext('2d');
+      if (window.myPoidsChart) window.myPoidsChart.destroy();
+      if (window.mySommeilChart) window.mySommeilChart.destroy();
+      window.myPoidsChart = new Chart(poidsCtx, {
+        type: 'line',
+        data: { labels: historiqueDates, datasets: [{ label: 'Poids (kg)', data: historiquePoids, borderColor: 'blue', fill: false }] },
+        options: { responsive: true }
+      });
+      window.mySommeilChart = new Chart(sommeilCtx, {
+        type: 'line',
+        data: { labels: historiqueDates, datasets: [{ label: 'Sommeil (1-5)', data: historiqueSommeil, borderColor: 'green', fill: false }] },
+        options: { responsive: true, scales: { y: { min: 0, max: 5 } } }
+      });
+    }
+  </script>
+</body>
+</html>
